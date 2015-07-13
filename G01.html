@@ -1,0 +1,163 @@
+<html>
+<head>
+	<title>Game</title>
+	<script type="text/javascript" src="game.js"></script>
+</head>
+<body>
+	<button onclick="startGame()">New</button>
+	<canvas id="paper" width="1366" height="600">
+	</canvas>
+</body>
+	<script type="text/javascript">
+
+		var canvas = document.getElementById("paper");
+		var targetX = canvas.width / 2;
+		var targetY = canvas.height / 2;
+		var ship =  {
+			point:0,
+			x: 0, 
+			y: 0,
+			radius: 5,
+			color: 'black',
+			v: 200,
+			moveTo: function(x, y, ms){
+				var st = this.v * ms / 1000;
+				var diffy = y - this.y;
+				var diffx = x - this.x;
+				var zeta = Math.atan(Math.abs((y - this.y)/(x - this.x)));				
+				var dy = diffy < 0 ? - 1 : 1;
+				var dx = diffx < 0 ? -1 : 1;				
+				if(!isNaN(zeta)){
+					this.x += Math.cos(zeta) * st * dx;
+					this.y += Math.sin(zeta) * st * dy;	
+				}
+				if(this.x > canvas.width)
+					this.x = canvas.width;
+				else if (this.x < 0)
+					this.x = 0;
+				if(this.y > canvas.height)
+					this.y = canvas.height;
+				else if(this.y < 0)
+					this.y = 0;	
+			},
+			eat: function(food){
+				food.eaten = true;
+				console.log(food.color);
+				if(eaten_food.color = "pink"){
+					point = +10;
+		};		
+				if(eaten_food.color = "yellow"){
+					point = -20;
+		};		
+				if(eaten_food.color = "green"){
+					point = +15;
+		};		
+				if(eaten_food.color = "red"){
+					point = +20;
+		};		
+				if(eaten_food.color = "blue"){
+					point = -15;
+		};		
+				if(eaten_food.color = "black"){
+					point = -10;
+		};		
+		var foods = [];
+		var gameRunning = false;
+		var lastStamp = 0;
+
+		setInterval(function(){
+					foods.push(new Enemy());
+		}, 1000);
+		function draw(){
+			if(gameRunning){			
+				var currentStamp = new Date().getTime();
+				if(lastStamp != 0){
+					var ms = currentStamp - lastStamp;
+					ship.moveTo(targetX, targetY, ms);
+				}
+				var eaten_foods = checkHits();
+				eaten_foods.forEach(function(food){
+					ship.eat(food);
+				})		        	
+		        
+
+				var context = canvas.getContext('2d');
+				context.clearRect(0, 0, canvas.width, canvas.height);	
+				context.beginPath();
+		        context.arc(ship.x, ship.y, ship.radius, 0, 2 * Math.PI, false);
+		        context.fillStyle = ship.color;
+		        context.fill();
+
+		        for(var i = 0; i < foods.length; i++){
+		        	if(foods[i].isAlive()){
+			        	context.beginPath();
+				        context.arc(foods[i].x, foods[i].y, foods[i].radius, 0, 2 * Math.PI, false);
+				        context.fillStyle = foods[i].color;
+				        context.fill();
+			    	}
+		        }
+		      
+				lastStamp = currentStamp;
+			}
+			window.requestAnimationFrame(draw);
+		}
+		window.requestAnimationFrame(draw);
+
+		function checkHits(){
+			var hits = []
+			for(var i = 0; i < foods.length; i++){
+				if(foods[i].isAlive() && distance(foods[i].x, foods[i].y,
+					ship.x, ship.y) <= ship.radius + foods[i].radius){
+					hits.push(foods[i]);
+				}
+			}
+			return hits;
+		}
+
+		function distance(x1, y1, x2, y2){
+			return Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
+		}
+
+		function onClick(x, y){
+			console.log(x + ":" + y);
+		}
+
+		function startGame(){
+			ship.x = canvas.width / 2;
+			ship.y = canvas.height / 2;
+			gameRunning = true;
+		}
+		
+        canvas.addEventListener('mousemove', function(evt) {
+	        var rect = canvas.getBoundingClientRect();
+	        targetX = evt.clientX - rect.left;
+	        targetY = evt.clientY - rect.top;	 
+      	}, false);
+
+      	canvas.addEventListener('mousedown', function(evt) {
+	        var rect = canvas.getBoundingClientRect();
+	        var x = evt.clientX - rect.left;
+	        var y = evt.clientY - rect.top;	 
+	        onClick(x, y);
+      	}, false);
+			var colors = ['red', 'blue', 'green', 'pink','yellow','black'];
+      	function Enemy(){
+      		this.x = Math.floor(Math.random()*canvas.width);
+      		this.y = Math.floor(Math.random()*canvas.height);
+      		this.lifetime = 3000;
+      		this.radius = 5;
+      		this.color = colors[random(colors.length)],
+      		this.eaten = false;      		
+      	}
+      	Enemy.prototype.live = function(ms){
+      		this.lifetime -= ms;
+      	}
+      	Enemy.prototype.isAlive = function(){
+      		return this.lifetime > 0 && !this.eaten; 
+      	} 
+      	function random(to, from){
+			from = from || 0
+			return Math.floor((Math.random() * to) + from);
+		}
+</script>  
+</html>
