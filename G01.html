@@ -4,16 +4,20 @@
 	<script type="text/javascript" src="game.js"></script>
 </head>
 <body>
-	<button onclick="startGame()">New</button>
 	<canvas id="paper" width="1366" height="600">
 	</canvas>
+	<font face="impact" color="blue">time :</font><font id="demo" face="impact" color="blue">0</font>
 </body>
-	<script type="text/javascript">
-
+	<script type="text/javascript">	
+	setInterval(function(){ myScore() }, 1000);
+function myScore() {  
+	    document.getElementById("demo").innerHTML = ship.time;
+	}
 		var canvas = document.getElementById("paper");
 		var targetX = canvas.width / 2;
 		var targetY = canvas.height / 2;
 		var ship =  {
+			time : 0,
 			point:0,
 			x: 0, 
 			y: 0,
@@ -39,7 +43,7 @@
 					this.y = canvas.height;
 				else if(this.y < 0)
 					this.y = 0;	
-			},
+			};
 			eat: function(food){
 				food.eaten = true;
 				console.log(food.color);
@@ -64,10 +68,14 @@
 		var foods = [];
 		var gameRunning = false;
 		var lastStamp = 0;
-
 		setInterval(function(){
 					foods.push(new Enemy());
 		}, 1000);
+
+		var x = 0;
+		setInterval(function(){
+			ship.time += x;
+		}, 1000)
 		function draw(){
 			if(gameRunning){			
 				var currentStamp = new Date().getTime();
@@ -80,14 +88,12 @@
 					ship.eat(food);
 				})		        	
 		        
-
 				var context = canvas.getContext('2d');
 				context.clearRect(0, 0, canvas.width, canvas.height);	
 				context.beginPath();
 		        context.arc(ship.x, ship.y, ship.radius, 0, 2 * Math.PI, false);
 		        context.fillStyle = ship.color;
 		        context.fill();
-
 		        for(var i = 0; i < foods.length; i++){
 		        	if(foods[i].isAlive()){
 			        	context.beginPath();
@@ -102,7 +108,6 @@
 			window.requestAnimationFrame(draw);
 		}
 		window.requestAnimationFrame(draw);
-
 		function checkHits(){
 			var hits = []
 			for(var i = 0; i < foods.length; i++){
@@ -113,15 +118,12 @@
 			}
 			return hits;
 		}
-
 		function distance(x1, y1, x2, y2){
 			return Math.sqrt(Math.pow(y2 - y1, 2) + Math.pow(x2 - x1, 2));
 		}
-
 		function onClick(x, y){
 			console.log(x + ":" + y);
 		}
-
 		function startGame(){
 			ship.x = canvas.width / 2;
 			ship.y = canvas.height / 2;
@@ -133,7 +135,6 @@
 	        targetX = evt.clientX - rect.left;
 	        targetY = evt.clientY - rect.top;	 
       	}, false);
-
       	canvas.addEventListener('mousedown', function(evt) {
 	        var rect = canvas.getBoundingClientRect();
 	        var x = evt.clientX - rect.left;
